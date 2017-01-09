@@ -19,13 +19,13 @@ char password[] = "4dprinter";
 #include "Adafruit_LEDBackpack.h"
 
 #include <Timezone.h>    // https://github.com/JChristensen/Timezone
-
+  
 TimeChangeRule CEST = {"CEST", Last, Sun, Mar, 2, 120};     //Central European Summer Time
 TimeChangeRule CET = {"CET ", Last, Sun, Oct, 3, 60}; //Central European Standard Time
 Timezone timezone(CEST, CET);
 
 WiFiUDP ntpUDP;
-// 0 time offset, update every hour
+// 0 minutes time offset, update every hour
 // any timezone offset is dealt with by Timezone to get better precision
 NTPClient timeClient(ntpUDP, "at.pool.ntp.org", 0, 60 * 60 * 1000);
 
@@ -44,10 +44,14 @@ void connectWifi() {
 }
 
 void writeTime() {
-  static time_t local_time = timezone.toLocal(timeClient.getEpochTime());
-  
-  matrix.print(hour(local_time) * 100 + minute(local_time)); // divide by 60 to get minutes and with the modulo only take today
-  matrix.drawColon(millis() % 1000 > 500);
+  static time_t local_time;
+  local_time = timezone.toLocal(timeClient.getEpochTime());
+  // to make sure we have all the leading 0s
+  matrix.writeDigitNum(0, hour(local_time) / 10 );
+  matrix.writeDigitNum(1, hour(local_time) % 10 );
+  matrix.writeDigitNum(3, minute(local_time) / 10 );
+  matrix.writeDigitNum(4, minute(local_time) % 10 );
+  matrix.drawColon(second(local_time) % 2);
   matrix.writeDisplay();
 }
 
