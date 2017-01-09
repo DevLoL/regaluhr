@@ -57,9 +57,8 @@ void writeTime() {
 
 void setup() {
   Serial.begin(9600);
-
   matrix.begin(0x70); // 0x70 is the I2C address of the display
-  matrix.write(10000); // clearing the display
+  matrix.setBrightness(10);
 
   connectWifi();
 
@@ -69,8 +68,10 @@ void setup() {
   timeClient.begin();
 }
 
-
 void loop() {
+  if (WiFi.status() != WL_CONNECTED) {
+    connectWifi();
+  }
   timeClient.update();
   writeTime();
 }
