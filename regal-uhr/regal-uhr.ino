@@ -1,6 +1,10 @@
-/*
+ /*
 
  Clock using NTP on an ESP8266 show the time on a 7-segment display
+ and a 60 pixel led strip.
+ The led strip has three "trains" representing second, minute and hour that
+ continuiously run the led strip. Over the period of a minute, hour and day
+ those trains will shift through the full hue on the HSV colour scale.
 
  (C) 2017 Thomas R. Koll
 
