@@ -29,6 +29,8 @@ WiFiUDP ntpUDP;
 // any timezone offset is dealt with by Timezone to get better precision
 NTPClient timeClient(ntpUDP, "at.pool.ntp.org", 0, 60 * 60 * 1000);
 
+static time_t local_time;
+
 Adafruit_7segment matrix = Adafruit_7segment();
 
 void connectWifi() {
@@ -41,11 +43,12 @@ void connectWifi() {
     delay(500);
     Serial.print(".");
   }
+
+  Serial.print("WiFi connected, IP address: ");
+  Serial.println(WiFi.localIP());
 }
 
-void writeTime() {
-  static time_t local_time;
-  local_time = timezone.toLocal(timeClient.getEpochTime());
+void displayTimeOn7Segment() {
   // to make sure we have all the leading 0s
   matrix.writeDigitNum(0, hour(local_time) / 10 );
   matrix.writeDigitNum(1, hour(local_time) % 10 );
@@ -55,23 +58,25 @@ void writeTime() {
   matrix.writeDisplay();
 }
 
+void loop() {
+  if (WiFi.status() != WL_CONNECTED) {
+    connectWifi();
+  }
+
+  timeClient.update();
+  local_time = timezone.toLocal(timeClient.getEpochTime());
+
+  displayTimeOn7Segment();
+  
+}
+
 void setup() {
   Serial.begin(9600);
   matrix.begin(0x70); // 0x70 is the I2C address of the display
   matrix.setBrightness(10);
 
   connectWifi();
-
-  Serial.print("WiFi connected, IP address: ");
-  Serial.println(WiFi.localIP());
   
   timeClient.begin();
-}
 
-void loop() {
-  if (WiFi.status() != WL_CONNECTED) {
-    connectWifi();
-  }
-  timeClient.update();
-  writeTime();
 }
