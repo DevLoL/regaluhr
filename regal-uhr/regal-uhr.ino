@@ -1,4 +1,4 @@
- /*
+/*
 
  Clock using NTP on an ESP8266 show the time on a 7-segment display
  and a 60 pixel led strip.
@@ -37,14 +37,12 @@ static time_t local_time;
 
 Adafruit_7segment matrix = Adafruit_7segment();
 
+// set up led strip
 #include "FastLED.h"
 
-// How many leds in your strip?
-#define NUM_LEDS 60
 #define FASTLED_ESP8266_RAW_PIN_ORDER
-#define DATA_PIN D6
-
-// Define the array of leds
+#define DATA_PIN D7
+#define NUM_LEDS 60
 CRGB leds[NUM_LEDS];
 
 #define LED_SPEED 10 // steps per second
@@ -83,21 +81,26 @@ void displayTimeOnLEDs() {
   static int pos = 0;
   static int pos_20 = 20;
   static int pos_40 = 40;
+
+  leds[pos].fadeLightBy(190);
+  leds[(pos + (NUM_LEDS - 1)) % NUM_LEDS].fadeLightBy(200);
+  leds[(pos + (NUM_LEDS - 2)) % NUM_LEDS].fadeLightBy(255);
+  leds[pos_20].fadeLightBy(190);
+  leds[(pos_20 + (NUM_LEDS - 1)) % NUM_LEDS].fadeLightBy(200);
+  leds[(pos_20 + (NUM_LEDS - 2)) % NUM_LEDS].fadeLightBy(255);
+  leds[pos_40].fadeLightBy(190);
+  leds[(pos_40 + (NUM_LEDS - 1)) % NUM_LEDS].fadeLightBy(200);
+  leds[(pos_40 + (NUM_LEDS - 2)) % NUM_LEDS].fadeLightBy(255);
+
+  pos = (pos + 1) % NUM_LEDS;
+  pos_20 = (pos_20 + 1) % NUM_LEDS;
+  pos_40 = (pos_40 + 1) % NUM_LEDS;
+
   // show leds for second, minute and hour, send them around the strip
   setLEDcolor(pos, CHSV(second(local_time) * 4.25, 255, 255), 5);
   setLEDcolor(pos_40, CHSV(minute(local_time) * 4.25, 255, 255), 3);
   setLEDcolor(pos_20, CHSV(hour(local_time) * 10.625, 255, 255), 2);
   FastLED.show();
-
-  // Only turn off the last LED, the rest was overwritten anyways
-  leds[pos] = CRGB::Black;
-  leds[pos_20] = CRGB::Black;
-  leds[pos_40] = CRGB::Black;
-  FastLED.show();
-
-  pos = (pos + 1) % NUM_LEDS;
-  pos_20 = (pos_20 + 1) % NUM_LEDS;
-  pos_40 = (pos_40 + 1) % NUM_LEDS;
 }
 
 void loop() {
@@ -112,7 +115,7 @@ void loop() {
 
   static unsigned long next_led_update = 0;
   if (next_led_update < millis()) {
-    next_led_update = millis() + (LED_SPEED / 1000);
+    next_led_update = millis() + (1000 / LED_SPEED);
     displayTimeOnLEDs();
   }
 }
