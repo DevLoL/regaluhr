@@ -3,7 +3,7 @@
  Clock using NTP on an ESP8266 show the time on a 7-segment display
  and a 60 pixel led strip.
  The led strip has three "trains" representing second, minute and hour that
- continuiously run the led strip. Over the period of a minute, hour and day
+ continuously run the led strip. Over the period of a minute, hour and day
  those trains will shift through the full hue on the HSV colour scale.
 
  (C) 2017 Thomas R. Koll
@@ -16,8 +16,8 @@
 #include <ESP8266WiFi.h> // https://github.com/esp8266/Arduino/
 #include <WiFiUdp.h>
 
-char ssid[] = "/dev/lol";
-char password[] = "4dprinter";
+char ssid[] = "myssid";
+char password[] = "secr3tpassword";
 
 #include <Adafruit_GFX.h>
 #include "Adafruit_LEDBackpack.h"
